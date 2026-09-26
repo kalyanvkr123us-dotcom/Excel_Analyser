@@ -34,10 +34,14 @@ function fallbackBranchKey(value) {
 
 function number(value) {
 	if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
-	const cleaned = text(value).replace(/[£$,]/g, '');
+	const raw = text(value).replace(/\s+/g, '');
+	if (!raw) return 0;
+	const negative = raw.startsWith('-') || (raw.startsWith('(') && raw.endsWith(')'));
+	const cleaned = raw.replace(/[£$,]/g, '').replace(/[()]/g, '');
 	if (!cleaned) return 0;
 	const parsed = Number(cleaned);
-	return Number.isFinite(parsed) ? parsed : 0;
+	if (!Number.isFinite(parsed)) return 0;
+	return negative ? -Math.abs(parsed) : parsed;
 }
 
 function formula(value) {
